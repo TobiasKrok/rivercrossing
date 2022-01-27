@@ -27,12 +27,22 @@ type World struct {
 	boat *Boat
 }
 
-// Definerer default tilstand for verden
-var occupants = []Occupant{{"HS", false, 3}, {"Rev", true, 2}, {"Kylling", true, 1}, {"Korn", false, 0}}
-var west = Land{"west", occupants}
-var east = Land{"east", []Occupant{}}
-var boat = Boat{&west, []Occupant{}}
-var world = World{east: &east, west: &west, boat: &boat}
+// Verdensvariabler
+var occupants []Occupant
+var west = Land{}
+var east = Land{}
+var boat = Boat{}
+var world = World{}
+
+// Oppretter en ny verden
+func CreateWorld() World {
+	occupants = []Occupant{{"HS", false, 3}, {"Rev", true, 2}, {"Kylling", true, 1}, {"Korn", false, 0}}
+	west = Land{"west", occupants}
+	east = Land{"east", []Occupant{}}
+	boat = Boat{&west, []Occupant{}}
+	world = World{east: &east, west: &west, boat: &boat}
+	return world
+}
 
 // Printer ut verdentilstanden
 func PrintWorld() {
@@ -52,11 +62,6 @@ func GetWorldStateString() string {
 
 	worldStr := westLandStr + boatStr + eastLandStr
 	return worldStr
-}
-
-// Returnerer verdentilstand
-func GetWorldState() World {
-	return world
 }
 
 // Flytter båten over elven

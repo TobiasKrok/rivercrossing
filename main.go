@@ -4,6 +4,8 @@ import rc "github.com/tobiaskrok/rivercrossing/rivercrossing"
 
 func main() {
 
+	rc.CreateWorld()
+
 	rc.PrintWorld()
 	rc.PutBoat("HS")
 	rc.PutBoat("Kylling")

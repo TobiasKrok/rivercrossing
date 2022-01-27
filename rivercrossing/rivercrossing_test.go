@@ -5,8 +5,28 @@ import (
 	"testing"
 )
 
-func TestWorldState(t *testing.T) {
+func TestWorldIllegalState(t *testing.T) {
 
+	world := CreateWorld()
+
+	PutBoat("Rev")
+	PutBoat("HS")
+	CrossRiver()
+	PopBoat("Rev")
+	CrossRiver()
+	PutBoat("Korn")
+	CrossRiver()
+	PopBoat("Korn")
+
+	state, legal := isWorldStateLegal(world)
+
+	if !legal {
+		t.Errorf("World state was illegal! \nState error returned: %v \n \n World State:  %v", state, GetWorldStateString())
+	}
+}
+
+func TestWorldLegalState(t *testing.T) {
+	world := CreateWorld()
 	PutBoat("Kylling")
 	PutBoat("HS")
 	CrossRiver()
@@ -15,12 +35,40 @@ func TestWorldState(t *testing.T) {
 	PutBoat("Korn")
 	CrossRiver()
 	PopBoat("Korn")
-	world := GetWorldState()
-	state, legal := isWorldStateLegal(world)
+	_, legal := isWorldStateLegal(world)
 
-	if !legal {
-		t.Errorf("World state was illegal! \nState error returned: %v \n \n World State:  %v", state, GetWorldStateString())
+	if legal {
+		t.Errorf("Illegal state was deemed legal! \n \n World State:  %v", GetWorldStateString())
 	}
+}
+
+func TestPutBoat(t *testing.T) {
+	world = CreateWorld()
+	PutBoat("Rev")
+
+	if !contains("Rev", world.boat.passengers) {
+		t.Errorf("Rev was not found in boat! \n \n World State: %v", GetWorldStateString())
+	}
+}
+
+func TestPopBoat(t *testing.T) {
+	//default posisjon for båten er vest, så vi antar at kyllingen vil være på øst
+	world := CreateWorld()
+
+	PutBoat("Kylling")
+	CrossRiver()
+	PopBoat("Kylling")
+
+	if !contains("Kylling", world.east.occupants) {
+		t.Errorf("Kylling was not found in the east! \n \n World State: %v", GetWorldStateString())
+	}
+}
+
+func TestAll(t *testing.T) {
+	t.Run("WORLD_ILLEGAL_STATE", TestWorldIllegalState)
+	t.Run("WORLD_LEGAL_STATE", TestWorldLegalState)
+	t.Run("BOAT_PUT", TestPutBoat)
+	t.Run("BOAT_POP", TestPopBoat)
 }
 
 // Tetser på om landstatus er ulovlig, og returnerer status
@@ -43,7 +91,7 @@ func isWorldStateLegal(world World) (string, bool) {
 // Sjekker om landtilstanden er lovlig
 func isLandStateLegal(land Land) (string, bool) {
 	worldLand := land.occupants
-	// Om HS er på land så betyr det at andre beboere kan skade hverandre, dermed sjekker vi om HS ikke er på land
+	// Om HS er på land så betyr det at andre beboere ikke kan skade hverandre, dermed sjekker vi om HS ikke er på land
 	if !contains("HS", worldLand) && len(worldLand) > 1 {
 		// sorter beboere slik at de med høyest styrke kommer først i slice
 		sort.Slice(worldLand, func(i, j int) bool {
